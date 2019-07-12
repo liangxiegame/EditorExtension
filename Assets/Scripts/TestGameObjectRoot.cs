@@ -1,9 +1,13 @@
 using UnityEngine;
+using EditorExtension;
 
-public partial class TestGameObjectRoot : MonoBehaviour
+namespace EditorExtension
 {
-	void Start()
+	public partial class TestGameObjectRoot : CodeGenerateInfo
 	{
-		// Code Here
+		void Start()
+		{
+			// Code Here
+		}
 	}
 }

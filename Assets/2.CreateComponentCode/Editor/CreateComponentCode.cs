@@ -8,11 +8,65 @@ using UnityEngine;
 
 namespace EditorExtension
 {
-    public static class CreateComponentCode
+    public class CreateComponentCode : EditorWindow
     {
+        [MenuItem("编辑器扩展/2.NamespaceSetting")]
+        static void Open()
+        {
+            var window = GetWindow<CreateComponentCode>();
+            window.Show();
+        }
+        
+        private void OnGUI()
+        {
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Namespace:");
+            NamespaceSettingsData.Namespace = GUILayout.TextField(NamespaceSettingsData.Namespace);
+            GUILayout.EndHorizontal();
+        }
+
         private static List<BindInfo> mBindInfos = new List<BindInfo>();
 
-        [MenuItem("GameObject/@EditorExtension-CreateCode", false, 0)]
+        [MenuItem("GameObject/@EditorExtension-Bind", false, 0)]
+        static void Bind()
+        {
+            var gameObject = Selection.objects.First() as GameObject;
+
+            if (!gameObject)
+            {
+                Debug.LogWarning("需要选择 GameObject");
+                return;
+            }
+
+            var view = gameObject.GetComponent<Bind>();
+
+            if (!view)
+            {
+                gameObject.AddComponent<Bind>();
+            }
+        }
+
+        
+        [MenuItem("GameObject/@EditorExtension-Add Code Generate Info", false, 0)]
+        static void AddView()
+        {
+            var gameObject = Selection.objects.First() as GameObject;
+
+            if (!gameObject)
+            {
+                Debug.LogWarning("需要选择 GameObject");
+                return;
+            }
+
+            var view = gameObject.GetComponent<CodeGenerateInfo>();
+
+            if (!view)
+            {
+                gameObject.AddComponent<CodeGenerateInfo>();
+            }
+        }
+        
+        [MenuItem("GameObject/@EditorExtension-Create Code", false, 0)]
         static void CreateCode()
         {
             var gameObject = Selection.objects.First() as GameObject;
@@ -25,7 +79,14 @@ namespace EditorExtension
 
             Debug.Log("Create Code");
 
+            var generateInfo = gameObject.GetComponent<CodeGenerateInfo>();
+
             var scriptsFolder = Application.dataPath + "/Scripts";
+
+            if (generateInfo)
+            {
+                scriptsFolder = generateInfo.ScriptsFolder;
+            }
 
             if (!Directory.Exists(scriptsFolder))
             {
@@ -46,6 +107,7 @@ namespace EditorExtension
         }
 
 
+
         static void SearchBinds(string path, Transform transform, List<BindInfo> binds)
         {
             var bind = transform.GetComponent<Bind>();
@@ -56,7 +118,9 @@ namespace EditorExtension
             {
                 binds.Add(new BindInfo()
                 {
-                    FindPath = path
+                    FindPath = path,
+                    Name = transform.name,
+                    ComponentName = bind.ComponentName
                 });
             }
 
@@ -73,11 +137,11 @@ namespace EditorExtension
             Debug.Log("DidReloadScripts");
             var generateClassName = EditorPrefs.GetString("GENERATE_CLASS_NAME");
             Debug.Log(generateClassName);
-            EditorPrefs.DeleteKey("GENERATE_CLASS_NAME");
 
             if (string.IsNullOrWhiteSpace(generateClassName))
             {
                 Debug.Log("不继续操作");
+                EditorPrefs.DeleteKey("GENERATE_CLASS_NAME");
             }
             else
             {
@@ -87,7 +151,15 @@ namespace EditorExtension
 
                 var defaultAssembly = assemblies.First(assembly => assembly.GetName().Name == "Assembly-CSharp");
 
-                var type = defaultAssembly.GetType(generateClassName);
+                var typeName = NamespaceSettingsData.Namespace + "." + generateClassName;
+                
+                var type = defaultAssembly.GetType(typeName);
+
+                if (type == null)
+                {
+                    Debug.Log("编译失败");
+                    return;
+                }
 
                 Debug.Log(type);
 
@@ -109,7 +181,7 @@ namespace EditorExtension
 
                 foreach (var bindInfo in mBindInfos)
                 {
-                    var name = bindInfo.FindPath.Split('/').Last();
+                    var name = bindInfo.Name;
 
                     Debug.Log(bindInfo.FindPath);
                     Debug.Log(name);
@@ -117,10 +189,55 @@ namespace EditorExtension
                     Debug.Log(gameObject.transform.Find(bindInfo.FindPath));
 
                     serialiedScript.FindProperty(name).objectReferenceValue =
-                        gameObject.transform.Find(bindInfo.FindPath).gameObject;
+                        gameObject.transform.Find(bindInfo.FindPath).GetComponent(bindInfo.ComponentName);
                 }
 
-                serialiedScript.ApplyModifiedPropertiesWithoutUndo();
+
+                var codeGenerateInfo = gameObject.GetComponent<CodeGenerateInfo>();
+
+                if (codeGenerateInfo)
+                {
+                    serialiedScript.FindProperty("ScriptsFolder").stringValue = codeGenerateInfo.ScriptsFolder;
+                    serialiedScript.FindProperty("PrefabFolder").stringValue = codeGenerateInfo.PrefabFolder;
+                    serialiedScript.FindProperty("GeneratePrefab").boolValue = codeGenerateInfo.GeneratePrefab;
+
+                    var generatePrefab = codeGenerateInfo.GeneratePrefab;
+                    var prefabFolder = codeGenerateInfo.PrefabFolder;
+                    var fullPrefabFolder = prefabFolder.Replace("Assets",Application.dataPath);
+
+                    if (codeGenerateInfo.GetType() == type)
+                    {
+                        
+                    }
+                    else
+                    {
+                        DestroyImmediate(codeGenerateInfo, false);
+                    }
+
+                    serialiedScript.ApplyModifiedPropertiesWithoutUndo();
+
+                    if (generatePrefab)
+                    {
+                        
+                        
+                        
+                        
+                        if (!Directory.Exists(fullPrefabFolder))
+                        {
+                            Directory.CreateDirectory(fullPrefabFolder);
+                        }
+
+                        PrefabUtility.SaveAsPrefabAssetAndConnect(gameObject, fullPrefabFolder + "/" + gameObject.name + ".prefab",
+                            InteractionMode.AutomatedAction);
+                    }
+                }
+                else
+                {
+                    serialiedScript.FindProperty("ScriptsFolder").stringValue = "Assets/Scripts";
+                    serialiedScript.ApplyModifiedPropertiesWithoutUndo();
+                }
+                
+                EditorPrefs.DeleteKey("GENERATE_CLASS_NAME");
             }
         }
     }

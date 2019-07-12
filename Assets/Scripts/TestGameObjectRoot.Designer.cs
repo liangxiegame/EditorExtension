@@ -1,10 +1,15 @@
+// Generate Id:d2f7e0bc-666e-417f-b50e-c06e241fb5ea
 using UnityEngine;
 
-public partial class TestGameObjectRoot
+namespace EditorExtension
 {
-	public GameObject GoGroups;
-	public GameObject go1;
-	public GameObject go2;
-	public GameObject go3;
+	public partial class TestGameObjectRoot
+	{
+		public Transform GoGroups;
+		public Transform go1;
+		public Transform go2;
+		public MeshRenderer go3;
+		public SpriteRenderer GoGroups2;
 
+	}
 }
