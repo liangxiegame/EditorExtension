@@ -1,4 +1,4 @@
-// Generate Id:d2f7e0bc-666e-417f-b50e-c06e241fb5ea
+// Generate Id:2ab5b8b6-38c6-498b-89ad-cc462bade37e
 using UnityEngine;
 
 namespace EditorExtension

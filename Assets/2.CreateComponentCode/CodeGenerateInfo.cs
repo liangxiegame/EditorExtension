@@ -1,24 +1,19 @@
 ﻿using UnityEngine;
+using UnityEngine.Internal;
 
 namespace EditorExtension
 {
     [ExecuteInEditMode]
     public class CodeGenerateInfo : MonoBehaviour
     {
-        private void Awake()
-        {
-            ScriptsFolder = "Assets/Scripts";
-            PrefabFolder = "Assets/Prefabs";
-        }
-
         [HideInInspector]
-        public string ScriptsFolder;
+        public string ScriptsFolder = "Assets/Scripts";
 
         [HideInInspector]
         public bool GeneratePrefab = false;
         
         
         [HideInInspector]
-        public string PrefabFolder;
+        public string PrefabFolder = "Assets/Prefabs";
     }
 }

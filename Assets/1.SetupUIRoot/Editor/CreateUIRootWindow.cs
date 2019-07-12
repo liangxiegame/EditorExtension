@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using UnityEngine;
 using UnityEditor;
 using UnityEngine.EventSystems;
@@ -10,7 +9,7 @@ namespace EditorExtension
 
     public class CreateUIRootWindow : EditorWindow
     {
-        [MenuItem("编辑器扩展/1.SetupUIRoot", true)]
+        [MenuItem("编辑器扩展/1.SetupUIRoot %u", true)]
         static bool ValidateUIRoot()
         {
             return !GameObject.Find("UIRoot");
@@ -40,7 +39,7 @@ namespace EditorExtension
             }
         }
 
-        [MenuItem("编辑器扩展/1.SetupUIRoot")]
+        [MenuItem("编辑器扩展/1.SetupUIRoot %u")]
         static void SetupUIRoot()
         {
             var window = GetWindow<CreateUIRootWindow>();

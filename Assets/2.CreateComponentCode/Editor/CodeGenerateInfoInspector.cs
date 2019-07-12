@@ -27,6 +27,7 @@ namespace EditorExtension
             GUILayout.BeginHorizontal();
             GUILayout.Label("Scripts Generate Folder:",GUILayout.Width(150));
             codeGenerateInfo.ScriptsFolder = GUILayout.TextField(codeGenerateInfo.ScriptsFolder);
+            
             GUILayout.EndHorizontal();
             
             GUILayout.BeginHorizontal();
@@ -43,9 +44,6 @@ namespace EditorExtension
             }
             
             GUILayout.EndHorizontal();
-
-            
         }
     }
-
 }

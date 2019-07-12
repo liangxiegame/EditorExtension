@@ -10,7 +10,7 @@ namespace EditorExtension
 {
     public class CreateComponentCode : EditorWindow
     {
-        [MenuItem("编辑器扩展/2.NamespaceSetting")]
+        [MenuItem("编辑器扩展/2.NamespaceSetting %t")]
         static void Open()
         {
             var window = GetWindow<CreateComponentCode>();
@@ -27,7 +27,7 @@ namespace EditorExtension
 
         private static List<BindInfo> mBindInfos = new List<BindInfo>();
 
-        [MenuItem("GameObject/@EditorExtension-Bind", false, 0)]
+        [MenuItem("GameObject/@(Alt+T) EditorExtension-Bind  &t", false, 0)]
         static void Bind()
         {
             var gameObject = Selection.objects.First() as GameObject;
@@ -47,7 +47,7 @@ namespace EditorExtension
         }
 
         
-        [MenuItem("GameObject/@EditorExtension-Add Code Generate Info", false, 0)]
+        [MenuItem("GameObject/@(Alt+G)EditorExtension-Add Code Generate Info &g", false, 0)]
         static void AddView()
         {
             var gameObject = Selection.objects.First() as GameObject;
@@ -66,7 +66,7 @@ namespace EditorExtension
             }
         }
         
-        [MenuItem("GameObject/@EditorExtension-Create Code", false, 0)]
+        [MenuItem("GameObject/@(Alt+C)EditorExtension-Create Code &c", false, 0)]
         static void CreateCode()
         {
             var gameObject = Selection.objects.First() as GameObject;
